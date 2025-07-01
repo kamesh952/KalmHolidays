@@ -3,5 +3,9 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: './', // Important for HashRouter
+  base: '/', // Set this if deploying to subpath
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true
+  }
 })
