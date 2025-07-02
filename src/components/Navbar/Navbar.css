@@ -896,3 +896,52 @@ body {
         top: 60px; /* Match navbar height */
     }
 }
+/* Sign In Button Styles - Desktop */
+.sign-in {
+    margin-left: 15px;
+}
+
+.sign-in > a {
+    padding: 8px 20px;
+    background-color: transparent;
+    border: 1px solid white;
+    border-radius: 20px;
+    transition: all 0.3s ease;
+}
+
+.sign-in > a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Mobile Sign In Button Styles */
+@media (max-width: 991px) {
+    /* Remove the display:none rule completely */
+    
+    /* Style for mobile sign-in button */
+    .nav-items .sign-in {
+        display: block;
+        margin-top: auto;
+        padding: 15px;
+        width: 100%;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: rgba(0, 0, 0, 0.2);
+        margin-left: 0;
+    }
+    
+    .nav-items .sign-in > a {
+        display: inline-block;
+        padding: 10px 25px;
+        background-color: #ffcc00;
+        color: #0077cc;
+        font-weight: bold;
+        border-radius: 20px;
+        border: none;
+        text-align: center;
+        width: auto;
+    }
+    
+    .nav-items .sign-in > a:hover {
+        background-color: #ffd633;
+    }
+}
