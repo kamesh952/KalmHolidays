@@ -17,13 +17,37 @@ import {
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
-import '@fontsource/poppins'; // Defaults to 400 weight
+import '@fontsource/poppins/100.css';
+import '@fontsource/poppins/200.css';
+import '@fontsource/poppins/300.css';
+import '@fontsource/poppins/400.css';
+import '@fontsource/poppins/500.css';
+import '@fontsource/poppins/600.css';
+import '@fontsource/poppins/700.css';
+import '@fontsource/poppins/800.css';
+import '@fontsource/poppins/900.css';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+// Create a theme with Poppins as the default font
+const theme = createTheme({
+  typography: {
+    fontFamily: 'Poppins, sans-serif',
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          fontFamily: 'Poppins, sans-serif',
+        },
+      },
+    },
+  },
+});
 
 const Wishlist = ({ onClose }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  const muiTheme = useTheme();
+  const isMobile = useMediaQuery(muiTheme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(muiTheme.breakpoints.between('sm', 'md'));
   
   const [wishlist, setWishlist] = useState([]);
   const [bookedDestinations, setBookedDestinations] = useState([]);
@@ -118,322 +142,326 @@ const Wishlist = ({ onClose }) => {
   };
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        maxWidth: '900px',
-        margin: '0 auto',
-        padding: isMobile ? '12px' : '24px',
-        fontFamily: 'Poppins, sans-serif',
-        position: 'relative',
-        boxSizing: 'border-box'
-      }}
-    >
-      {/* Header Section */}
+    <ThemeProvider theme={theme}>
       <Box
         sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: isMobile ? '16px' : '24px',
-          padding: isMobile ? '0 4px' : '0'
+          width: '100%',
+          maxWidth: '900px',
+          margin: '0 auto',
+          padding: isMobile ? '12px' : '24px',
+          fontFamily: 'Poppins, sans-serif',
+          position: 'relative',
+          boxSizing: 'border-box'
         }}
       >
-        <Typography
-          variant={isMobile ? 'h6' : 'h5'}
+        {/* Header Section */}
+        <Box
           sx={{
-            fontWeight: 700,
-            color: '#2874f0',
-            fontSize: isMobile ? '1.25rem' : '1.5rem',
-            lineHeight: 1.2
-          }}
-        >
-          My Wishlist
-        </Typography>
-        {onClose && (
-          <IconButton 
-            onClick={onClose} 
-            aria-label="close"
-            size={isMobile ? 'small' : 'medium'}
-            sx={{
-              marginLeft: 'auto',
-              padding: isMobile ? '4px' : '8px'
-            }}
-          >
-            <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
-          </IconButton>
-        )}
-      </Box>
-      
-      <Divider sx={{ 
-        marginBottom: isMobile ? '16px' : '24px',
-        borderColor: 'rgba(0, 0, 0, 0.12)'
-      }} />
-      
-      {/* Empty State */}
-      {wishlist.length === 0 ? (
-        <Paper
-          sx={{
-            padding: isMobile ? '24px 16px' : '32px 24px',
-            textAlign: 'center',
-            backgroundColor: '#f9f9f9',
-            borderRadius: '12px',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-            margin: isMobile ? '0 4px' : '0'
-          }}
-        >
-          <FavoriteIcon 
-            sx={{ 
-              fontSize: isMobile ? '48px' : '64px',
-              color: '#e0e0e0',
-              marginBottom: '16px'
-            }} 
-          />
-          <Typography 
-            variant={isMobile ? 'body1' : 'h6'} 
-            color="textSecondary"
-            sx={{
-              marginBottom: '16px',
-              fontSize: isMobile ? '1rem' : '1.25rem'
-            }}
-          >
-            Your wishlist is empty
-          </Typography>
-          <Button
-            variant="contained"
-            size={isMobile ? 'medium' : 'large'}
-            sx={{
-              backgroundColor: '#2874f0',
-              color: '#fff',
-              padding: isMobile ? '8px 16px' : '10px 24px',
-              fontSize: isMobile ? '0.875rem' : '1rem',
-              fontWeight: 500,
-              borderRadius: '8px',
-              textTransform: 'none',
-              '&:hover': {
-                backgroundColor: '#1a65db'
-              }
-            }}
-            onClick={handleExplore}
-          >
-            Explore Destinations
-          </Button>
-        </Paper>
-      ) : (
-        <Grid 
-          container 
-          spacing={isMobile ? 2 : 3}
-          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: isMobile ? '16px' : '24px',
             padding: isMobile ? '0 4px' : '0'
           }}
         >
-          {wishlist.map((item) => (
-            <Grid 
-              item 
-              xs={12} 
-              sm={6} 
-              md={6} 
-              key={item.id}
+          <Typography
+            variant={isMobile ? 'h6' : 'h5'}
+            sx={{
+              fontWeight: 700,
+              color: '#2874f0',
+              fontSize: isMobile ? '1.25rem' : '1.5rem',
+              lineHeight: 1.2
+            }}
+          >
+            My Wishlist
+          </Typography>
+          {onClose && (
+            <IconButton 
+              onClick={onClose} 
+              aria-label="close"
+              size={isMobile ? 'small' : 'medium'}
               sx={{
-                display: 'flex',
-                justifyContent: 'center'
+                marginLeft: 'auto',
+                padding: isMobile ? '4px' : '8px'
               }}
             >
-              <Card
+              <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
+            </IconButton>
+          )}
+        </Box>
+        
+        <Divider sx={{ 
+          marginBottom: isMobile ? '16px' : '24px',
+          borderColor: 'rgba(0, 0, 0, 0.12)'
+        }} />
+        
+        {/* Empty State */}
+        {wishlist.length === 0 ? (
+          <Paper
+            sx={{
+              padding: isMobile ? '24px 16px' : '32px 24px',
+              textAlign: 'center',
+              backgroundColor: '#f9f9f9',
+              borderRadius: '12px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+              margin: isMobile ? '0 4px' : '0'
+            }}
+          >
+            <FavoriteIcon 
+              sx={{ 
+                fontSize: isMobile ? '48px' : '64px',
+                color: '#e0e0e0',
+                marginBottom: '16px'
+              }} 
+            />
+            <Typography 
+              variant={isMobile ? 'body1' : 'h6'} 
+              color="textSecondary"
+              sx={{
+                marginBottom: '16px',
+                fontSize: isMobile ? '1rem' : '1.25rem',
+                fontWeight: 500
+              }}
+            >
+              Your wishlist is empty
+            </Typography>
+            <Button
+              variant="contained"
+              size={isMobile ? 'medium' : 'large'}
+              sx={{
+                backgroundColor: '#2874f0',
+                color: '#fff',
+                padding: isMobile ? '8px 16px' : '10px 24px',
+                fontSize: isMobile ? '0.875rem' : '1rem',
+                fontWeight: 500,
+                borderRadius: '8px',
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#1a65db'
+                }
+              }}
+              onClick={handleExplore}
+            >
+              Explore Destinations
+            </Button>
+          </Paper>
+        ) : (
+          <Grid 
+            container 
+            spacing={isMobile ? 2 : 3}
+            sx={{
+              padding: isMobile ? '0 4px' : '0'
+            }}
+          >
+            {wishlist.map((item) => (
+              <Grid 
+                item 
+                xs={12} 
+                sm={6} 
+                md={6} 
+                key={item.id}
                 sx={{
-                  width: '100%',
-                  maxWidth: '400px',
-                  borderRadius: '12px',
-                  overflow: 'hidden',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.3s, box-shadow 0.3s',
-                  '&:hover': {
-                    transform: isMobile ? 'none' : 'translateY(-4px)',
-                    boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : '0 6px 12px rgba(0,0,0,0.15)',
-                  }
+                  display: 'flex',
+                  justifyContent: 'center'
                 }}
               >
-                {/* Image Section */}
-                <Box 
-                  sx={{ 
-                    position: 'relative',
-                    width: '100%', 
-                    height: isMobile ? '180px' : isTablet ? '200px' : '240px',
-                    overflow: 'hidden'
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    image={item.img}
-                    alt={item.label}
-                    sx={{ 
-                      width: '100%', 
-                      height: '100%',
-                      objectFit: 'cover',
-                      objectPosition: 'center'
-                    }}
-                  />
-                  <Box
-                    sx={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
-                      backgroundColor: 'rgba(40, 116, 240, 0.9)',
-                      color: 'white',
-                      padding: isMobile ? '4px 8px' : '6px 12px',
-                      borderRadius: '0 0 0 8px',
-                      fontWeight: 600,
-                      fontSize: isMobile ? '0.75rem' : '0.875rem'
-                    }}
-                  >
-                    {item.price}
-                  </Box>
-                  <IconButton
-                    onClick={() => removeFromWishlist(item)}
-                    sx={{
-                      position: 'absolute',
-                      top: '8px',
-                      right: '8px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
-                      padding: isMobile ? '4px' : '6px',
-                      '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      }
-                    }}
-                  >
-                    <FavoriteIcon 
-                      fontSize={isMobile ? 'small' : 'medium'} 
-                      sx={{ color: '#ff3366' }} 
-                    />
-                  </IconButton>
-                </Box>
-                
-                {/* Content Section */}
-                <CardContent 
-                  sx={{ 
-                    padding: isMobile ? '12px' : '16px',
-                    '&:last-child': {
-                      paddingBottom: isMobile ? '12px' : '16px'
+                <Card
+                  sx={{
+                    width: '100%',
+                    maxWidth: '400px',
+                    borderRadius: '12px',
+                    overflow: 'hidden',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    transition: 'transform 0.3s, box-shadow 0.3s',
+                    '&:hover': {
+                      transform: isMobile ? 'none' : 'translateY(-4px)',
+                      boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : '0 6px 12px rgba(0,0,0,0.15)',
                     }
                   }}
                 >
-                  <Typography 
-                    gutterBottom 
-                    variant={isMobile ? 'subtitle1' : 'h6'}
-                    sx={{
-                      fontWeight: 600,
-                      fontSize: isMobile ? '1rem' : '1.125rem',
-                      marginBottom: isMobile ? '8px' : '12px',
-                      lineHeight: 1.3,
-                      color: '#333'
-                    }}
-                  >
-                    {item.label}
-                  </Typography>
-                  <Typography 
-                    variant="body2" 
-                    color="text.secondary"
+                  {/* Image Section */}
+                  <Box 
                     sx={{ 
-                      marginBottom: isMobile ? '12px' : '16px',
-                      display: '-webkit-box',
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      fontSize: isMobile ? '0.8125rem' : '0.875rem',
-                      lineHeight: 1.5
+                      position: 'relative',
+                      width: '100%', 
+                      height: isMobile ? '180px' : isTablet ? '200px' : '240px',
+                      overflow: 'hidden'
                     }}
                   >
-                    {item.description || 'No description available'}
-                  </Typography>
-                  
-                  {/* Action Buttons */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      gap: isMobile ? '8px' : '12px'
-                    }}
-                  >
-                    <Button
-                      variant="contained"
-                      size={isMobile ? 'small' : 'medium'}
-                      sx={{
-                        backgroundColor: '#2874f0',
-                        color: '#fff',
-                        fontSize: isMobile ? '0.75rem' : '0.8125rem',
-                        fontWeight: 500,
-                        padding: isMobile ? '6px 12px' : '8px 16px',
-                        borderRadius: '6px',
-                        textTransform: 'none',
-                        flex: 1,
-                        '&:hover': {
-                          backgroundColor: '#1a65db'
-                        },
-                        '&.Mui-disabled': {
-                          backgroundColor: '#e0e0e0',
-                          color: '#9e9e9e'
-                        }
+                    <CardMedia
+                      component="img"
+                      image={item.img}
+                      alt={item.label}
+                      sx={{ 
+                        width: '100%', 
+                        height: '100%',
+                        objectFit: 'cover',
+                        objectPosition: 'center'
                       }}
-                      onClick={() => handleBookDestination(item)}
-                      disabled={isDestinationBooked(item.id)}
+                    />
+                    <Box
+                      sx={{
+                        position: 'absolute',
+                        top: 0,
+                        right: 0,
+                        backgroundColor: 'rgba(40, 116, 240, 0.9)',
+                        color: 'white',
+                        padding: isMobile ? '4px 8px' : '6px 12px',
+                        borderRadius: '0 0 0 8px',
+                        fontWeight: 600,
+                        fontSize: isMobile ? '0.75rem' : '0.875rem'
+                      }}
                     >
-                      {isDestinationBooked(item.id) ? 'Already Booked' : 'Book Now'}
-                    </Button>
-                    <Button
-                      variant="outlined"
-                      size={isMobile ? 'small' : 'medium'}
+                      {item.price}
+                    </Box>
+                    <IconButton
                       onClick={() => removeFromWishlist(item)}
                       sx={{
-                        borderColor: '#ff3366',
-                        color: '#ff3366',
-                        fontSize: isMobile ? '0.75rem' : '0.8125rem',
-                        fontWeight: 500,
-                        padding: isMobile ? '6px 12px' : '8px 16px',
-                        borderRadius: '6px',
-                        textTransform: 'none',
-                        flex: 1,
+                        position: 'absolute',
+                        top: '8px',
+                        right: '8px',
+                        backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                        padding: isMobile ? '4px' : '6px',
                         '&:hover': {
-                          borderColor: '#e61a4d',
-                          backgroundColor: 'rgba(255, 51, 102, 0.05)'
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
                         }
                       }}
                     >
-                      Remove
-                    </Button>
+                      <FavoriteIcon 
+                        fontSize={isMobile ? 'small' : 'medium'} 
+                        sx={{ color: '#ff3366' }} 
+                      />
+                    </IconButton>
                   </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      )}
-      
-      {/* Notification Snackbar */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={4000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        sx={{
-          bottom: isMobile ? '72px' : '24px'
-        }}
-      >
-        <Alert 
-          onClose={() => setOpenSnackbar(false)} 
-          severity={snackbarSeverity}
-          sx={{ 
-            width: '100%',
-            maxWidth: isMobile ? 'calc(100% - 32px)' : '400px',
-            fontSize: isMobile ? '0.875rem' : '1rem',
-            alignItems: 'center',
-            borderRadius: '8px'
+                  
+                  {/* Content Section */}
+                  <CardContent 
+                    sx={{ 
+                      padding: isMobile ? '12px' : '16px',
+                      '&:last-child': {
+                        paddingBottom: isMobile ? '12px' : '16px'
+                      }
+                    }}
+                  >
+                    <Typography 
+                      gutterBottom 
+                      variant={isMobile ? 'subtitle1' : 'h6'}
+                      sx={{
+                        fontWeight: 600,
+                        fontSize: isMobile ? '1rem' : '1.125rem',
+                        marginBottom: isMobile ? '8px' : '12px',
+                        lineHeight: 1.3,
+                        color: '#333'
+                      }}
+                    >
+                      {item.label}
+                    </Typography>
+                    <Typography 
+                      variant="body2" 
+                      color="text.secondary"
+                      sx={{ 
+                        marginBottom: isMobile ? '12px' : '16px',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        fontSize: isMobile ? '0.8125rem' : '0.875rem',
+                        lineHeight: 1.5
+                      }}
+                    >
+                      {item.description || 'No description available'}
+                    </Typography>
+                    
+                    {/* Action Buttons */}
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        gap: isMobile ? '8px' : '12px'
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        size={isMobile ? 'small' : 'medium'}
+                        sx={{
+                          backgroundColor: '#2874f0',
+                          color: '#fff',
+                          fontSize: isMobile ? '0.75rem' : '0.8125rem',
+                          fontWeight: 500,
+                          padding: isMobile ? '6px 12px' : '8px 16px',
+                          borderRadius: '6px',
+                          textTransform: 'none',
+                          flex: 1,
+                          '&:hover': {
+                            backgroundColor: '#1a65db'
+                          },
+                          '&.Mui-disabled': {
+                            backgroundColor: '#e0e0e0',
+                            color: '#9e9e9e'
+                          }
+                        }}
+                        onClick={() => handleBookDestination(item)}
+                        disabled={isDestinationBooked(item.id)}
+                      >
+                        {isDestinationBooked(item.id) ? 'Already Booked' : 'Book Now'}
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        size={isMobile ? 'small' : 'medium'}
+                        onClick={() => removeFromWishlist(item)}
+                        sx={{
+                          borderColor: '#ff3366',
+                          color: '#ff3366',
+                          fontSize: isMobile ? '0.75rem' : '0.8125rem',
+                          fontWeight: 500,
+                          padding: isMobile ? '6px 12px' : '8px 16px',
+                          borderRadius: '6px',
+                          textTransform: 'none',
+                          flex: 1,
+                          '&:hover': {
+                            borderColor: '#e61a4d',
+                            backgroundColor: 'rgba(255, 51, 102, 0.05)'
+                          }
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+        
+        {/* Notification Snackbar */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          sx={{
+            bottom: isMobile ? '72px' : '24px'
           }}
         >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
+          <Alert 
+            onClose={() => setOpenSnackbar(false)} 
+            severity={snackbarSeverity}
+            sx={{ 
+              width: '100%',
+              maxWidth: isMobile ? 'calc(100% - 32px)' : '400px',
+              fontSize: isMobile ? '0.875rem' : '1rem',
+              alignItems: 'center',
+              borderRadius: '8px',
+              fontFamily: 'Poppins, sans-serif'
+            }}
+          >
+            {snackbarMessage}
+          </Alert>
+        </Snackbar>
+      </Box>
+    </ThemeProvider>
   );
 };
 

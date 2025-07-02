@@ -877,147 +877,22 @@ body {
   }
 }
 
-@media (max-width: 767px) {
-    .search-container {
-        order: 1;
-        width: 100%;
-        margin: 10px 15px;
-        max-width: none;
+@media (max-width: 991px) {
+    .navbar {
+        /* Set a fixed height including padding */
+        padding: 15px 15px; /* Adjust padding as needed */
     }
-    
-    .search-input {
-        padding: 12px 45px 12px 15px;
-        font-size: 16px;
+
+    .nav-items {
+        top: 60px; /* Match this with the navbar height */
+        right: -100%;
+        width: 280px;
+        height: calc(100vh - 60px); /* Adjust this to match */
+        /* rest of your styles */
     }
-    
-    .search-icon {
-        right: 20px;
-        font-size: 18px;
+
+    /* If you have a mobile menu overlay */
+    .mobile-menu-overlay {
+        top: 60px; /* Match navbar height */
     }
-    .hamburger {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 24px;
-    height: 18px;
-    cursor: pointer;
-    z-index: 1001;
-}
-
-.hamburger span {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background: white;
-    transition: all 0.3s ease;
-}
-
-.hamburger.active span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
-}
-
-.hamburger.active span:nth-child(2) {
-    opacity: 0;
-}
-
-.hamburger.active span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
-}@media (max-width: 767px) {
-    .search-container {
-        order: 1;
-        width: 100%;
-        margin: 10px 15px;
-        max-width: none;
-    }
-    
-    .search-input {
-        padding: 12px 45px 12px 15px;
-        font-size: 16px;
-    }
-    
-    .search-icon {
-        right: 20px;
-        font-size: 18px;
-    }
-}.mobile-user-profile {
-    padding: 20px;
-    background: rgba(0,0,0,0.15);
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.mobile-profile-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: #ffcc00;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #0077cc;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-.mobile-profile-info {
-    flex: 1;
-}
-
-.mobile-profile-name {
-    font-weight: 600;
-    color: white;
-    margin-bottom: 3px;
-}
-
-.mobile-profile-email {
-    font-size: 13px;
-    color: rgba(255,255,255,0.8);
-}
-
-.mobile-profile-action {
-    width: 100%;
-    padding: 0 20px;
-    margin-bottom: 10px;
-}
-
-.mobile-profile-action a {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    color: white;
-    text-decoration: none;
-    font-size: 15px;
-}
-
-.mobile-profile-action i {
-    margin-right: 12px;
-    font-size: 18px;
-}.mobile-menu-overlay {
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.mobile-menu-overlay.active {
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Add smooth transitions for all interactive elements */
-.nav-item > a, 
-.dropdown a, 
-.search-input, 
-.hamburger, 
-.sign-in > a {
-    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
 }
