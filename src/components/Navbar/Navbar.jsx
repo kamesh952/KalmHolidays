@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Navbar.css';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Link } from 'react-router-dom';
-import MyBookings from './bookings'; // Import the MyBookings component
+import MyBookings from './bookings';
+import Wishlist from './wish';
 
 const Navbar = () => {
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -21,6 +22,14 @@ const Navbar = () => {
   // My Bookings states
   const [showBookingsModal, setShowBookingsModal] = useState(false);
   const [bookingsCount, setBookingsCount] = useState(0);
+
+  // Wishlist states
+  const [showWishlistModal, setShowWishlistModal] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
+
+  // Refs for click outside detection
+  const profileIconRef = useRef(null);
+  const profileDropdownRef = useRef(null);
 
   // Check if viewport is mobile/tablet
   useEffect(() => {
@@ -94,22 +103,50 @@ const Navbar = () => {
     };
   }, []);
 
-  // Close mobile menu when clicking outside
+  // Check and update wishlist count
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      const navbar = document.getElementById('navbar');
-      if ((isNavOpen || isProfileDropdownOpen || isCountryDropdownOpen) && navbar && !navbar.contains(event.target)) {
-        setIsNavOpen(false);
-        setActiveDropdown(null);
-        setIsCountryDropdownOpen(false);
-        setIsProfileDropdownOpen(false);
+    const updateWishlistCount = () => {
+      const storedWishlist = localStorage.getItem('wishlistDestinations');
+      if (storedWishlist) {
+        try {
+          const wishlist = JSON.parse(storedWishlist);
+          setWishlistCount(wishlist.length);
+        } catch (error) {
+          console.error("Error parsing wishlist destinations:", error);
+        }
+      } else {
+        setWishlistCount(0);
       }
     };
     
-    document.addEventListener('mousedown', handleClickOutside);
+    updateWishlistCount();
+    window.addEventListener('wishlistUpdated', updateWishlistCount);
+    
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('wishlistUpdated', updateWishlistCount);
     };
+  }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+  const handleClickOutside = (event) => {
+  const navbar = document.getElementById('navbar');
+  
+  // Close profile dropdown if clicked outside
+  if (isProfileDropdownOpen && 
+      profileIconRef.current && 
+      !profileIconRef.current.contains(event.target)) {
+    setIsProfileDropdownOpen(false);
+  }
+  
+  if ((isNavOpen || isCountryDropdownOpen) && 
+      navbar && 
+      !navbar.contains(event.target)) {  // Removed the extra parenthesis
+    setIsNavOpen(false);
+    setActiveDropdown(null);
+    setIsCountryDropdownOpen(false);
+  }
+};
   }, [isNavOpen, isProfileDropdownOpen, isCountryDropdownOpen]);
 
   // Add body scroll lock when menu is open
@@ -131,6 +168,8 @@ const Navbar = () => {
       setActiveDropdown(null);
       setIsCountryDropdownOpen(false);
     }
+    // Close profile dropdown when toggling nav
+    setIsProfileDropdownOpen(false);
   };
 
   const navigateToHome = () => {
@@ -181,6 +220,10 @@ const Navbar = () => {
     setIsProfileDropdownOpen(!isProfileDropdownOpen);
     setActiveDropdown(null);
     setIsCountryDropdownOpen(false);
+    // Close mobile nav when opening profile dropdown
+    if (isNavOpen) {
+      setIsNavOpen(false);
+    }
   };
 
   const openProfileModal = (e) => {
@@ -208,6 +251,19 @@ const Navbar = () => {
     document.body.style.overflow = 'auto';
   };
 
+  // Wishlist Modal functions
+  const openWishlistModal = (e) => {
+    e.preventDefault();
+    setShowWishlistModal(true);
+    setIsProfileDropdownOpen(false);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeWishlistModal = () => {
+    setShowWishlistModal(false);
+    document.body.style.overflow = 'auto';
+  };
+
   const handleLogout = (e) => {
     e.preventDefault();
     localStorage.removeItem('currentLoggedInUser');
@@ -227,7 +283,7 @@ const Navbar = () => {
 
   return (
     <>
-     <link rel="icon" type="image/png" href="KALM(1)(1)(1).png" />
+      <link rel="icon" type="image/png" href="KALM(1)(1)(1).png" />
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -244,6 +300,7 @@ const Navbar = () => {
         <div className="mobile-controls">
           {isLoggedIn && isMobile && (
             <div 
+              ref={profileIconRef}
               className="profile-icon-mobile" 
               onClick={toggleProfileDropdown}
               style={{
@@ -260,7 +317,9 @@ const Navbar = () => {
                 cursor: 'pointer',
                 border: '2px solid white',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                marginRight: '15px'
+                marginRight: '15px',
+                zIndex: 1002,
+                position: 'relative'
               }}
             >
               {getUserInitial()}
@@ -425,8 +484,21 @@ const Navbar = () => {
                       </span>
                     )}
                   </a>
-                  <a href="#">
+                  <a href="#" onClick={openWishlistModal}>
                     <i className="fas fa-heart" style={{marginRight: '10px'}}></i> Wishlist
+                    {wishlistCount > 0 && (
+                      <span style={{
+                        background: '#ffcc00',
+                        color: '#000',
+                        borderRadius: '50%',
+                        padding: '2px 6px',
+                        fontSize: '12px',
+                        marginLeft: '5px',
+                        fontWeight: 'bold'
+                      }}>
+                        {wishlistCount}
+                      </span>
+                    )}
                   </a>
                   <a href="#" onClick={handleLogout} style={{color: '#ff3333'}}>
                     <i className="fas fa-sign-out-alt" style={{marginRight: '10px'}}></i> Logout
@@ -516,6 +588,28 @@ const Navbar = () => {
                     </span>
                   )}
                 </a>
+                <a href="#" onClick={openWishlistModal} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  color: 'white',
+                  padding: '8px 0',
+                  textDecoration: 'none'
+                }}>
+                  <i className="fas fa-heart" style={{marginRight: '10px'}}></i> Wishlist
+                  {wishlistCount > 0 && (
+                    <span style={{
+                      background: '#ffcc00',
+                      color: '#000',
+                      borderRadius: '50%',
+                      padding: '2px 6px',
+                      fontSize: '12px',
+                      marginLeft: '5px',
+                      fontWeight: 'bold'
+                    }}>
+                      {wishlistCount}
+                    </span>
+                  )}
+                </a>
                 <a href="#" onClick={handleLogout} style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -565,6 +659,7 @@ const Navbar = () => {
       {/* Mobile Profile Dropdown - Positioned absolutely and controlled separately from hamburger menu */}
       {isLoggedIn && isMobile && isProfileDropdownOpen && (
         <div 
+          ref={profileDropdownRef}
           style={{
             position: 'fixed',
             top: '70px',
@@ -623,7 +718,7 @@ const Navbar = () => {
               </span>
             )}
           </a>
-          <a href="#" style={{
+          <a href="#" onClick={openWishlistModal} style={{
             display: 'block',
             padding: '12px 15px',
             textDecoration: 'none',
@@ -631,6 +726,19 @@ const Navbar = () => {
             borderBottom: '1px solid #f0f0f0',
           }}>
             <i className="fas fa-heart" style={{marginRight: '10px'}}></i> Wishlist
+            {wishlistCount > 0 && (
+              <span style={{
+                background: '#ffcc00',
+                color: '#000',
+                borderRadius: '50%',
+                padding: '2px 6px',
+                fontSize: '12px',
+                marginLeft: '5px',
+                fontWeight: 'bold'
+              }}>
+                {wishlistCount}
+              </span>
+            )}
           </a>
           <a href="#" onClick={handleLogout} style={{
             display: 'block',
@@ -823,6 +931,42 @@ const Navbar = () => {
             }}
           >
             <MyBookings onClose={closeBookingsModal} />
+          </div>
+        </div>
+      )}
+      
+      {/* Wishlist Modal */}
+      {showWishlistModal && (
+        <div
+          className="wishlist-modal-overlay"
+          onClick={closeWishlistModal}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 2000
+          }}
+        >
+          <div 
+            className="wishlist-modal-content"
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              width: '95%',
+              maxWidth: '900px',
+              maxHeight: '90vh',
+              overflow: 'auto',
+              boxShadow: '0 5px 20px rgba(0,0,0,0.2)'
+            }}
+          >
+            <Wishlist onClose={closeWishlistModal} />
           </div>
         </div>
       )}

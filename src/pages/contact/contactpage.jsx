@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button, Grid, Card, CardContent } from '@mui/material';
+import { Box, Typography, Button, Grid, Card, CardContent, useMediaQuery } from '@mui/material';
 import { Phone, Email } from '@mui/icons-material';
 import { styled } from '@mui/system';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -14,12 +14,21 @@ const theme = createTheme({
     h2: {
       fontSize: '2.5rem',
       color: '#003580',
+      '@media (max-width:600px)': {
+        fontSize: '2rem',
+      },
     },
     h5: {
       fontSize: '1.25rem',
+      '@media (max-width:600px)': {
+        fontSize: '1.1rem',
+      },
     },
     body1: {
       fontSize: '1.125rem',
+      '@media (max-width:600px)': {
+        fontSize: '1rem',
+      },
     },
   },
   components: {
@@ -37,6 +46,12 @@ const theme = createTheme({
           '&:last-child': {
             paddingBottom: '24px',
           },
+          '@media (max-width:600px)': {
+            padding: '16px',
+            '&:last-child': {
+              paddingBottom: '16px',
+            },
+          },
         },
       },
     },
@@ -44,12 +59,12 @@ const theme = createTheme({
 });
 
 const OfficeCard = styled(Card)(({ theme }) => ({
-  marginTop: '60px',
+  marginTop: theme.spacing(4),
   background: 'white',
   borderRadius: '10px',
   boxShadow: '6px 4px 6px rgba(0, 0, 0, 0.1)',
-  width: '350px',
-  height: '100%',
+  width: '100%',
+  maxWidth: '350px',
   minHeight: '320px',
   display: 'flex',
   flexDirection: 'column',
@@ -57,18 +72,27 @@ const OfficeCard = styled(Card)(({ theme }) => ({
   '&:hover': {
     transform: 'translateY(-5px)',
   },
+  [theme.breakpoints.down('sm')]: {
+    marginTop: theme.spacing(2),
+    minHeight: '280px',
+    maxWidth: '100%',
+  },
 }));
 
-const ContactLink = styled('a')({
+const ContactLink = styled('a')(({ theme }) => ({
   textDecoration: 'none',
   color: '#ff8c00',
   fontWeight: 'bold',
   display: 'block',
   marginBottom: '10px',
   fontFamily: "'Playfair Display', serif",
-});
+  fontSize: '1rem',
+  [theme.breakpoints.down('sm')]: {
+    fontSize: '0.9rem',
+  },
+}));
 
-const StyledButton = styled(Button)({
+const StyledButton = styled(Button)(({ theme }) => ({
   fontFamily: "'Poppins', serif",
   background: '#0357cc',
   color: 'rgb(255, 255, 255)',
@@ -81,12 +105,19 @@ const StyledButton = styled(Button)({
   display: 'block',
   width: '100%',
   marginTop: 'auto',
+  fontSize: '0.9rem',
   '&:hover': {
     background: '#e0a800',
   },
-});
+  [theme.breakpoints.down('sm')]: {
+    padding: '8px',
+    fontSize: '0.85rem',
+  },
+}));
 
 const BranchesPage = () => {
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  
   const branches = [
     {
       city: 'MUMBAI',
@@ -127,63 +158,69 @@ const BranchesPage = () => {
   ];
 
   return (
-    // Removed ThemeProvider to avoid global style conflicts
-    <Box sx={{ 
-      backgroundColor: '#f9f9f9',
-      padding: '20px',
-      // Removed minHeight: '100vh' which could cause layout issues
-    }}>
-      <Typography variant="h2" sx={{ 
-        textAlign: 'center',
-        marginBottom: '40px',
-        fontFamily: "'Playfair Display', serif", // Explicitly set font family
-        color: '#003580' // Explicitly set color
+    <ThemeProvider theme={theme}>
+      <Box sx={{ 
+        backgroundColor: '#f9f9f9',
+        padding: isSmallScreen ? '15px' : '20px',
       }}>
-        Branches Over the State
-      </Typography>
-      
-      <Grid container spacing={3} sx={{ 
-        maxWidth: '1400px',
-        margin: '0 auto',
-        marginBottom: '60px',
-        justifyContent: 'center'
-      }}>
-        {branches.map((branch, index) => (
-          <Grid item key={index} xs={12} sm={6} lg={4}>
-            <OfficeCard>
-              <CardContent sx={{ flexGrow: 1 }}>
-                <Typography variant="h5" component="h3" sx={{ 
-                  marginBottom: '10px',
-                  fontFamily: "'Playfair Display', serif" // Explicitly set font family
-                }}>
-                  {branch.city}
-                </Typography>
-                <Typography variant="body1" sx={{ 
-                  color: '#555', 
-                  marginBottom: '5px',
-                  fontFamily: "'Playfair Display', serif" // Explicitly set font family 
-                }}>
-                  {branch.address}
-                </Typography>
-                <ContactLink href={`tel:${branch.phone}`}>
-                  <Phone sx={{ verticalAlign: 'middle', marginRight: '5px' }} />
-                  {branch.phone}
-                </ContactLink>
-                <ContactLink href={`mailto:${branch.email}`}>
-                  <Email sx={{ verticalAlign: 'middle', marginRight: '5px' }} />
-                  {branch.email}
-                </ContactLink>
-              </CardContent>
-              <Box sx={{ padding: '0 24px 24px' }}>
-                <StyledButton variant="contained">
-                  OFFICE DETAILS
-                </StyledButton>
-              </Box>
-            </OfficeCard>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+        <Typography variant="h2" sx={{ 
+          textAlign: 'center',
+          marginBottom: isSmallScreen ? '20px' : '40px',
+          padding: isSmallScreen ? '0 10px' : '0',
+        }}>
+          Branches Over the State
+        </Typography>
+        
+        <Grid container spacing={isSmallScreen ? 2 : 3} sx={{ 
+          maxWidth: '1400px',
+          margin: '0 auto',
+          marginBottom: isSmallScreen ? '30px' : '60px',
+          justifyContent: 'center',
+          padding: isSmallScreen ? '0 10px' : '0',
+        }}>
+          {branches.map((branch, index) => (
+            <Grid item key={index} xs={12} sm={6} md={4} lg={4}>
+              <OfficeCard>
+                <CardContent sx={{ flexGrow: 1 }}>
+                  <Typography variant="h5" component="h3" sx={{ 
+                    marginBottom: '10px',
+                  }}>
+                    {branch.city}
+                  </Typography>
+                  <Typography variant="body1" sx={{ 
+                    color: '#555', 
+                    marginBottom: '5px',
+                  }}>
+                    {branch.address}
+                  </Typography>
+                  <ContactLink href={`tel:${branch.phone}`}>
+                    <Phone sx={{ 
+                      verticalAlign: 'middle', 
+                      marginRight: '5px',
+                      fontSize: isSmallScreen ? '1rem' : 'inherit',
+                    }} />
+                    {branch.phone}
+                  </ContactLink>
+                  <ContactLink href={`mailto:${branch.email}`}>
+                    <Email sx={{ 
+                      verticalAlign: 'middle', 
+                      marginRight: '5px',
+                      fontSize: isSmallScreen ? '1rem' : 'inherit',
+                    }} />
+                    {branch.email}
+                  </ContactLink>
+                </CardContent>
+                <Box sx={{ padding: isSmallScreen ? '0 16px 16px' : '0 24px 24px' }}>
+                  <StyledButton variant="contained">
+                    OFFICE DETAILS
+                  </StyledButton>
+                </Box>
+              </OfficeCard>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </ThemeProvider>
   );
 };
 

@@ -11,12 +11,20 @@ import {
   Divider,
   IconButton,
   Snackbar,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import '@fontsource/poppins'; // Defaults to 400 weight
+
 
 const Wishlist = ({ onClose }) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
+  
   const [wishlist, setWishlist] = useState([]);
   const [bookedDestinations, setBookedDestinations] = useState([]);
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -60,18 +68,14 @@ const Wishlist = ({ onClose }) => {
     };
   }, []);
 
-  // Check if a destination is already booked
   const isDestinationBooked = (destId) => {
     return bookedDestinations.some(booking => booking.id === destId);
   };
 
-  // Remove from wishlist
   const removeFromWishlist = (destination) => {
     const updatedWishlist = wishlist.filter(item => item.id !== destination.id);
     setWishlist(updatedWishlist);
     localStorage.setItem('wishlistDestinations', JSON.stringify(updatedWishlist));
-    
-    // Trigger event for other components to update
     window.dispatchEvent(new CustomEvent('wishlistUpdated', { 
       detail: { wishlist: updatedWishlist } 
     }));
@@ -81,7 +85,6 @@ const Wishlist = ({ onClose }) => {
     setOpenSnackbar(true);
   };
 
-  // Book a destination
   const handleBookDestination = (destination) => {
     if (isDestinationBooked(destination.id)) {
       setSnackbarMessage('This destination is already booked!');
@@ -99,8 +102,6 @@ const Wishlist = ({ onClose }) => {
     const updatedBookings = [...bookedDestinations, booking];
     setBookedDestinations(updatedBookings);
     localStorage.setItem('bookedDestinations', JSON.stringify(updatedBookings));
-    
-    // Trigger an event for other components to update
     window.dispatchEvent(new CustomEvent('bookingsUpdated', { detail: { bookings: updatedBookings } }));
     
     setSnackbarMessage('Destination booked successfully!');
@@ -108,7 +109,6 @@ const Wishlist = ({ onClose }) => {
     setOpenSnackbar(true);
   };
 
-  // Navigate to explore
   const handleExplore = () => {
     if (onClose) {
       onClose();
@@ -123,57 +123,93 @@ const Wishlist = ({ onClose }) => {
         width: '100%',
         maxWidth: '900px',
         margin: '0 auto',
-        padding: '20px',
+        padding: isMobile ? '12px' : '24px',
         fontFamily: 'Poppins, sans-serif',
-        position: 'relative'
+        position: 'relative',
+        boxSizing: 'border-box'
       }}
     >
-      {/* Header with close button */}
+      {/* Header Section */}
       <Box
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          marginBottom: '20px'
+          marginBottom: isMobile ? '16px' : '24px',
+          padding: isMobile ? '0 4px' : '0'
         }}
       >
         <Typography
-          variant="h5"
+          variant={isMobile ? 'h6' : 'h5'}
           sx={{
-            fontWeight: 'bold',
+            fontWeight: 700,
             color: '#2874f0',
-            fontFamily: 'Poppins, sans-serif'
+            fontSize: isMobile ? '1.25rem' : '1.5rem',
+            lineHeight: 1.2
           }}
         >
           My Wishlist
         </Typography>
         {onClose && (
-          <IconButton onClick={onClose} aria-label="close">
-            <CloseIcon />
+          <IconButton 
+            onClick={onClose} 
+            aria-label="close"
+            size={isMobile ? 'small' : 'medium'}
+            sx={{
+              marginLeft: 'auto',
+              padding: isMobile ? '4px' : '8px'
+            }}
+          >
+            <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
           </IconButton>
         )}
       </Box>
       
-      <Divider sx={{ marginBottom: '20px' }} />
+      <Divider sx={{ 
+        marginBottom: isMobile ? '16px' : '24px',
+        borderColor: 'rgba(0, 0, 0, 0.12)'
+      }} />
       
+      {/* Empty State */}
       {wishlist.length === 0 ? (
         <Paper
           sx={{
-            padding: '30px',
+            padding: isMobile ? '24px 16px' : '32px 24px',
             textAlign: 'center',
             backgroundColor: '#f9f9f9',
             borderRadius: '12px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.05)'
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            margin: isMobile ? '0 4px' : '0'
           }}
         >
-          <Typography variant="h6" color="textSecondary">
-            Your wishlist is empty.
+          <FavoriteIcon 
+            sx={{ 
+              fontSize: isMobile ? '48px' : '64px',
+              color: '#e0e0e0',
+              marginBottom: '16px'
+            }} 
+          />
+          <Typography 
+            variant={isMobile ? 'body1' : 'h6'} 
+            color="textSecondary"
+            sx={{
+              marginBottom: '16px',
+              fontSize: isMobile ? '1rem' : '1.25rem'
+            }}
+          >
+            Your wishlist is empty
           </Typography>
           <Button
             variant="contained"
+            size={isMobile ? 'medium' : 'large'}
             sx={{
               backgroundColor: '#2874f0',
-              marginTop: '15px',
+              color: '#fff',
+              padding: isMobile ? '8px 16px' : '10px 24px',
+              fontSize: isMobile ? '0.875rem' : '1rem',
+              fontWeight: 500,
+              borderRadius: '8px',
+              textTransform: 'none',
               '&:hover': {
                 backgroundColor: '#1a65db'
               }
@@ -184,27 +220,45 @@ const Wishlist = ({ onClose }) => {
           </Button>
         </Paper>
       ) : (
-        <Grid container spacing={3}>
+        <Grid 
+          container 
+          spacing={isMobile ? 2 : 3}
+          sx={{
+            padding: isMobile ? '0 4px' : '0'
+          }}
+        >
           {wishlist.map((item) => (
-            <Grid item xs={12} sm={6} md={6} key={item.id}>
+            <Grid 
+              item 
+              xs={12} 
+              sm={6} 
+              md={6} 
+              key={item.id}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center'
+              }}
+            >
               <Card
                 sx={{
+                  width: '100%',
+                  maxWidth: '400px',
                   borderRadius: '12px',
                   overflow: 'hidden',
-                  boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
                   '&:hover': {
-                    transform: 'translateY(-5px)',
-                    boxShadow: '0 6px 12px rgba(0,0,0,0.15)',
+                    transform: isMobile ? 'none' : 'translateY(-4px)',
+                    boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : '0 6px 12px rgba(0,0,0,0.15)',
                   }
                 }}
               >
-                {/* Image container with fixed dimensions */}
+                {/* Image Section */}
                 <Box 
                   sx={{ 
                     position: 'relative',
                     width: '100%', 
-                    height: '220px', 
+                    height: isMobile ? '180px' : isTablet ? '200px' : '240px',
                     overflow: 'hidden'
                   }}
                 >
@@ -224,11 +278,12 @@ const Wishlist = ({ onClose }) => {
                       position: 'absolute',
                       top: 0,
                       right: 0,
-                      backgroundColor: 'rgba(40, 116, 240, 0.85)',
+                      backgroundColor: 'rgba(40, 116, 240, 0.9)',
                       color: 'white',
-                      padding: '4px 8px',
+                      padding: isMobile ? '4px 8px' : '6px 12px',
                       borderRadius: '0 0 0 8px',
-                      fontWeight: 'bold'
+                      fontWeight: 600,
+                      fontSize: isMobile ? '0.75rem' : '0.875rem'
                     }}
                   >
                     {item.price}
@@ -237,25 +292,40 @@ const Wishlist = ({ onClose }) => {
                     onClick={() => removeFromWishlist(item)}
                     sx={{
                       position: 'absolute',
-                      top: '10px',
-                      right: '10px',
-                      backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                      top: '8px',
+                      right: '8px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      padding: isMobile ? '4px' : '6px',
                       '&:hover': {
-                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
                       }
                     }}
                   >
-                    <FavoriteIcon sx={{ color: '#ff3366' }} />
+                    <FavoriteIcon 
+                      fontSize={isMobile ? 'small' : 'medium'} 
+                      sx={{ color: '#ff3366' }} 
+                    />
                   </IconButton>
                 </Box>
                 
-                <CardContent>
+                {/* Content Section */}
+                <CardContent 
+                  sx={{ 
+                    padding: isMobile ? '12px' : '16px',
+                    '&:last-child': {
+                      paddingBottom: isMobile ? '12px' : '16px'
+                    }
+                  }}
+                >
                   <Typography 
                     gutterBottom 
-                    variant="h6"
+                    variant={isMobile ? 'subtitle1' : 'h6'}
                     sx={{
-                      fontWeight: 'bold',
-                      fontFamily: 'Poppins, sans-serif'
+                      fontWeight: 600,
+                      fontSize: isMobile ? '1rem' : '1.125rem',
+                      marginBottom: isMobile ? '8px' : '12px',
+                      lineHeight: 1.3,
+                      color: '#333'
                     }}
                   >
                     {item.label}
@@ -264,30 +334,45 @@ const Wishlist = ({ onClose }) => {
                     variant="body2" 
                     color="text.secondary"
                     sx={{ 
-                      mb: 2,
+                      marginBottom: isMobile ? '12px' : '16px',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      textOverflow: 'ellipsis'
+                      textOverflow: 'ellipsis',
+                      fontSize: isMobile ? '0.8125rem' : '0.875rem',
+                      lineHeight: 1.5
                     }}
                   >
                     {item.description || 'No description available'}
                   </Typography>
+                  
+                  {/* Action Buttons */}
                   <Box
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      mt: 1
+                      gap: isMobile ? '8px' : '12px'
                     }}
                   >
                     <Button
                       variant="contained"
-                      size="small"
+                      size={isMobile ? 'small' : 'medium'}
                       sx={{
                         backgroundColor: '#2874f0',
+                        color: '#fff',
+                        fontSize: isMobile ? '0.75rem' : '0.8125rem',
+                        fontWeight: 500,
+                        padding: isMobile ? '6px 12px' : '8px 16px',
+                        borderRadius: '6px',
+                        textTransform: 'none',
+                        flex: 1,
                         '&:hover': {
                           backgroundColor: '#1a65db'
+                        },
+                        '&.Mui-disabled': {
+                          backgroundColor: '#e0e0e0',
+                          color: '#9e9e9e'
                         }
                       }}
                       onClick={() => handleBookDestination(item)}
@@ -297,11 +382,17 @@ const Wishlist = ({ onClose }) => {
                     </Button>
                     <Button
                       variant="outlined"
-                      size="small"
+                      size={isMobile ? 'small' : 'medium'}
                       onClick={() => removeFromWishlist(item)}
                       sx={{
                         borderColor: '#ff3366',
                         color: '#ff3366',
+                        fontSize: isMobile ? '0.75rem' : '0.8125rem',
+                        fontWeight: 500,
+                        padding: isMobile ? '6px 12px' : '8px 16px',
+                        borderRadius: '6px',
+                        textTransform: 'none',
+                        flex: 1,
                         '&:hover': {
                           borderColor: '#e61a4d',
                           backgroundColor: 'rgba(255, 51, 102, 0.05)'
@@ -318,17 +409,26 @@ const Wishlist = ({ onClose }) => {
         </Grid>
       )}
       
-      {/* Snackbar for notifications */}
+      {/* Notification Snackbar */}
       <Snackbar
         open={openSnackbar}
         autoHideDuration={4000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        sx={{
+          bottom: isMobile ? '72px' : '24px'
+        }}
       >
         <Alert 
           onClose={() => setOpenSnackbar(false)} 
           severity={snackbarSeverity}
-          sx={{ width: '100%' }}
+          sx={{ 
+            width: '100%',
+            maxWidth: isMobile ? 'calc(100% - 32px)' : '400px',
+            fontSize: isMobile ? '0.875rem' : '1rem',
+            alignItems: 'center',
+            borderRadius: '8px'
+          }}
         >
           {snackbarMessage}
         </Alert>

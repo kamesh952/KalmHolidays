@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Car from "../Home/car"; // Adjust the path based on your actual structure
-import FaqPage from "./faqc"
-import TourismLoginSignup from "../Home/login"; // Make sure this path is correct
+import Car from "../Home/car";
+import FaqPage from "./faqc";
+import TourismLoginSignup from "../Home/login";
+import { useTheme, useMediaQuery } from '@mui/material';
 
-// Modal component for the login form with improved animations and cleanup
 const LoginModal = ({ isOpen, onClose }) => {
   const [visible, setVisible] = useState(false);
   const modalContentRef = useRef(null);
   const modalOverlayRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Handle animation states when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
@@ -18,18 +19,15 @@ const LoginModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // If modal is not open, don't render anything
   if (!isOpen) return null;
 
-  // Function to handle outside clicks with proper animation
   const handleOverlayClick = (e) => {
     if (e.target === modalOverlayRef.current) {
       setVisible(false);
-      setTimeout(onClose, 300); // Wait for fade out animation before removing from DOM
+      setTimeout(onClose, 300);
     }
   };
 
-  // Handle successful login closure
   const handleLoginSuccess = () => {
     setVisible(false);
     setTimeout(onClose, 300);
@@ -57,14 +55,14 @@ const LoginModal = ({ isOpen, onClose }) => {
         transition: 'opacity 0.3s ease, backdrop-filter 0.3s ease'
       }}
     >
-      {/* Modal content with animation */}
       <div
         ref={modalContentRef}
         onClick={(e) => e.stopPropagation()}
         style={{ 
-          zIndex: 1001, 
-          width: '100%', 
-          maxWidth: '900px',
+          zIndex: 1001,
+          width: isMobile ? '95%' : '100%',
+          maxWidth: isMobile ? '100%' : '900px',
+          padding: isMobile ? '10px' : '20px',
           opacity: visible ? 1 : 0,
           transform: visible ? 'scale(1)' : 'scale(0.95)',
           transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4)'
@@ -80,8 +78,9 @@ function FAQ() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  // Check for logged in user on component mount
   useEffect(() => {
     const currentUser = localStorage.getItem('currentLoggedInUser');
     if (currentUser) {
@@ -90,7 +89,6 @@ function FAQ() {
       setUserName(user.username);
     }
     
-    // Listen for login/logout events
     const handleUserLogin = () => {
       const loggedInUser = localStorage.getItem('currentLoggedInUser');
       if (loggedInUser) {
@@ -115,55 +113,39 @@ function FAQ() {
     };
   }, []);
 
-  // Function to handle sign in button click from Navbar
   const handleSignInClick = () => {
     setIsLoginModalOpen(true);
-    // Add a class to the body to prevent scrolling when modal is open
     document.body.style.overflow = 'hidden';
   };
 
-  // Function to handle logout
   const handleLogout = () => {
     localStorage.removeItem('currentLoggedInUser');
     setIsLoggedIn(false);
     setUserName("");
-    // Dispatch event that user logged out
     window.dispatchEvent(new CustomEvent('userLoggedOut'));
   };
 
-  // Function to close the login modal with enhanced cleanup
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
-    // Re-enable scrolling when modal is closed
     document.body.style.overflow = 'auto';
-    
-    // Ensure any backdrop filters or blurs are completely removed
     document.body.style.backdropFilter = 'none';
     document.body.style.WebkitBackdropFilter = 'none';
-    
-    // Force repaint to ensure blur is gone - this is key to fixing the blur issue
     document.body.style.transform = 'translateZ(0)';
     
-    // Reset the transform after a short delay
     setTimeout(() => {
       document.body.style.transform = '';
     }, 50);
   };
   
-  // Add the handleSignInClick function to the window object
-  // so the Navbar component can access it
   useEffect(() => {
     window.openLoginModal = handleSignInClick;
     
-    // Cleanup the global function when component unmounts
     return () => {
       delete window.openLoginModal;
-      // Make sure to reset overflow in case component unmounts with modal open
       document.body.style.overflow = 'auto';
     };
   }, []);
 
-  // Add ESC key event listener to close modal
   useEffect(() => {
     const handleEscKey = (event) => {
       if (event.key === 'Escape' && isLoginModalOpen) {
@@ -173,25 +155,21 @@ function FAQ() {
     
     document.addEventListener('keydown', handleEscKey);
     
-    // Cleanup
     return () => {
       document.removeEventListener('keydown', handleEscKey);
     };
   }, [isLoginModalOpen]);
 
   return (
-    <div>
-      
-
+    <div style={{ overflowX: 'hidden' }}>
       <div style={{
-        height: '550px',
+        height: isMobile ? '300px' : '550px',
         overflow: 'hidden',
       }}>
         <Car />
       </div>
       <FaqPage />
       
-      {/* Login Modal */}
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </div>
   );

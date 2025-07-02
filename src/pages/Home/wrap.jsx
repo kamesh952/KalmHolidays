@@ -9,7 +9,9 @@ import {
   CardContent,
   IconButton,
   Snackbar,
-  Alert
+  Alert,
+  useMediaQuery,
+  useTheme
 } from '@mui/material';
 import DirectionsBikeIcon from '@mui/icons-material/DirectionsBike';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
@@ -32,36 +34,41 @@ const PoppinsFontImport = () => {
 // Custom styled components
 const NavTab = (props) => {
   const { active, onClick, startIcon, children } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   return (
     <Button
       onClick={onClick}
-      startIcon={startIcon}
+      startIcon={isMobile ? null : startIcon}
       sx={{
         fontFamily: "'Poppins', sans-serif",
-        padding: '10px 15px',
+        padding: isMobile ? '8px 12px' : '10px 15px',
         border: active ? '2px solid #0071c2' : 'none',
         borderRadius: '15px',
         background: 'white',
         cursor: 'pointer',
-        fontSize: '16px',
+        fontSize: isMobile ? '14px' : '16px',
         display: 'flex',
         gap: '5px',
         transition: 'background 0.1s, color 0.3s',
         color: active ? '#0071c2' : 'inherit',
         fontWeight: 'bold',
+        minWidth: 'auto',
         '&:hover': {
           backgroundColor: '#ebebeb',
         },
       }}
     >
-      {children}
+      {isMobile ? React.cloneElement(startIcon, { sx: { fontSize: '18px' } }) : children}
     </Button>
   );
 };
 
 const DestinationCard = (props) => {
   const { destination, onBook, onWishlist, isWishlisted, isBooked } = props;
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   
   return (
     <Card
@@ -69,10 +76,10 @@ const DestinationCard = (props) => {
         position: 'relative',
         borderRadius: '8px',
         overflow: 'hidden',
-        width: '230px',
+        width: isMobile ? '160px' : '230px',
         flexShrink: 0,
         boxShadow: '4px 4px 8px rgba(0, 0, 0, 0.1)',
-        padding: '10px',
+        padding: isMobile ? '6px' : '10px',
         marginRight: '10px',
         transition: 'transform 0.3s ease-in-out',
         '&:hover': {
@@ -83,7 +90,7 @@ const DestinationCard = (props) => {
       <Box sx={{ position: 'relative' }}>
         <CardMedia
           component="img"
-          height="150"
+          height={isMobile ? '100' : '150'}
           image={destination.image}
           alt={destination.title}
           sx={{ objectFit: 'cover', borderRadius: '4px' }}
@@ -94,21 +101,21 @@ const DestinationCard = (props) => {
           onClick={() => onWishlist(destination)}
           sx={{
             position: 'absolute',
-            top: '8px',
-            right: '8px',
+            top: '4px',
+            right: '4px',
             backgroundColor: 'rgba(255, 255, 255, 0.7)',
             padding: '4px',
             '&:hover': {
               backgroundColor: 'rgba(255, 255, 255, 0.9)',
             },
-            width: '32px',
-            height: '32px',
+            width: isMobile ? '28px' : '32px',
+            height: isMobile ? '28px' : '32px',
           }}
         >
           {isWishlisted ? (
-            <FavoriteIcon sx={{ color: '#ff3366', fontSize: '20px' }} />
+            <FavoriteIcon sx={{ color: '#ff3366', fontSize: isMobile ? '16px' : '20px' }} />
           ) : (
-            <FavoriteBorderIcon sx={{ color: '#ff3366', fontSize: '20px' }} />
+            <FavoriteBorderIcon sx={{ color: '#ff3366', fontSize: isMobile ? '16px' : '20px' }} />
           )}
         </IconButton>
         
@@ -121,13 +128,12 @@ const DestinationCard = (props) => {
           sx={{
             position: 'absolute',
             fontFamily: "'Poppins', sans-serif",
-            bottom: '8px',
-            right: '8px',
+            bottom: '4px',
+            right: '4px',
             backgroundColor: isBooked ? '#7cb342' : '#0071c2',
-            fontSize: '0.75rem',
-            padding: '4px 8px',
+            fontSize: isMobile ? '0.65rem' : '0.75rem',
+            padding: isMobile ? '2px 4px' : '4px 8px',
             minWidth: 'auto',
-            
             borderRadius: '4px',
             '&:hover': {
               backgroundColor: isBooked ? '#7cb342' : '#00508c',
@@ -138,19 +144,21 @@ const DestinationCard = (props) => {
             }
           }}
         >
-          {isBooked ? 'Booked' : 'Book'}
+          {isBooked ? 'Booked' : isMobile ? '' : 'Book'}
         </Button>
       </Box>
-      <CardContent sx={{ padding: '8px 0' }}>
+      <CardContent sx={{ padding: isMobile ? '4px 0' : '8px 0' }}>
         <Typography className="destination-title" sx={{ 
           fontWeight: 'bold', 
           marginTop: '5px',
           fontFamily: "'Poppins', sans-serif",
+          fontSize: isMobile ? '14px' : '16px',
         }}>
           {destination.title}
         </Typography>
         <Typography sx={{ 
           fontFamily: "'Poppins', sans-serif",
+          fontSize: isMobile ? '12px' : '14px',
         }}>
           {destination.distance}
         </Typography>
@@ -159,33 +167,38 @@ const DestinationCard = (props) => {
   );
 };
 
-const CardsContainer = (props) => (
-  <Box
-    {...props}
-    sx={{
-      padding: '10px 0',
-      display: 'flex',
-      gap: '15px',
-      overflowX: 'auto',
-      scrollbarWidth: 'thin',
-      scrollbarColor: '#ccc #f5f5f5',
-      justifyContent: 'flex-start',
-      maxWidth: '95%',
-      margin: '0 auto',
-      '&::-webkit-scrollbar': {
-        height: '8px',
-      },
-      '&::-webkit-scrollbar-track': {
-        background: '#f5f5f5',
-        margin: '10px',
-      },
-      '&::-webkit-scrollbar-thumb': {
-        background: '#ccc',
-        borderRadius: '10px',
-      },
-    }}
-  />
-);
+const CardsContainer = (props) => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  
+  return (
+    <Box
+      {...props}
+      sx={{
+        padding: '10px 0',
+        display: 'flex',
+        gap: isMobile ? '8px' : '15px',
+        overflowX: 'auto',
+        scrollbarWidth: 'thin',
+        scrollbarColor: '#ccc #f5f5f5',
+        justifyContent: 'flex-start',
+        width: '100%',
+        margin: '0 auto',
+        '&::-webkit-scrollbar': {
+          height: '6px',
+        },
+        '&::-webkit-scrollbar-track': {
+          background: '#f5f5f5',
+          margin: isMobile ? '0' : '10px',
+        },
+        '&::-webkit-scrollbar-thumb': {
+          background: '#ccc',
+          borderRadius: '10px',
+        },
+      }}
+    />
+  );
+};
 
 // Destination data
 const destinations = {
@@ -236,6 +249,8 @@ export default function EnhancedDestinations() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   // Load wishlist and bookings from localStorage on component mount
   useEffect(() => {
@@ -387,33 +402,43 @@ export default function EnhancedDestinations() {
     <Box sx={{ 
       fontFamily: "'Poppins', sans-serif", 
       fontWeight: 'light', 
-      padding: '50px 5%'
+      padding: isMobile ? '20px 10px' : '50px 5%',
+      width: '100%',
+      boxSizing: 'border-box',
     }}>
       <PoppinsFontImport />
-      <Container maxWidth="xl">
+      <Container maxWidth="xl" sx={{ padding: isMobile ? '0' : 'inherit' }}>
         <Box sx={{ marginLeft: { xs: '0px', sm: '70px' } }}>
-          <Typography variant="h4" component="h2" sx={{ 
+          <Typography variant={isMobile ? "h5" : "h4"} component="h2" sx={{ 
             marginBottom: '10px',
             fontFamily: "'Poppins', sans-serif",
             fontWeight: 600,
+            fontSize: isMobile ? '1.5rem' : '2.125rem',
           }}>
             Quick and easy trip planner
           </Typography>
           
           <Typography sx={{ 
             fontFamily: "'Poppins', sans-serif", 
-            marginBottom: '20px' 
+            marginBottom: '20px',
+            fontSize: isMobile ? '14px' : '16px',
           }}>
             Pick a vibe and explore the top destinations in India
           </Typography>
           
           <Box sx={{ 
             display: 'flex', 
-            gap: '10px', 
+            gap: isMobile ? '6px' : '10px', 
             marginBottom: '20px',
             flexWrap: 'wrap',
             fontFamily: "'Poppins', sans-serif",
             fontWeight: 'bold',
+            overflowX: isMobile ? 'auto' : 'visible',
+            scrollbarWidth: 'none',
+            '&::-webkit-scrollbar': {
+              display: 'none',
+            },
+            paddingBottom: isMobile ? '10px' : '0',
           }}>
             <NavTab
               active={activeCategory === 'outdoors'}
@@ -462,6 +487,7 @@ export default function EnhancedDestinations() {
           overflowX: 'auto', 
           display: 'flex', 
           justifyContent: 'center',
+          width: '100%',
         }}>
           <CardsContainer>
             {destinations[activeCategory].map((destination) => (
@@ -488,7 +514,7 @@ export default function EnhancedDestinations() {
         <Alert 
           onClose={handleCloseSnackbar} 
           severity={snackbarSeverity}
-          sx={{ width: '100%' }}
+          sx={{ width: isMobile ? '90%' : '100%' }}
         >
           {snackbarMessage}
         </Alert>

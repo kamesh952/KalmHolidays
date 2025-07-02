@@ -1,15 +1,73 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Car from "../Home/car"; // Adjust the path based on your actual structure
-import Content from "./main"
-import TourismLoginSignup from "../Home/login"; // Make sure this path is correct
+import React, { useState, useEffect, useRef } from "react";
+import Car from "../Home/car";
+import Content from "./main";
+import TourismLoginSignup from "../Home/login";
+import "@fontsource/poppins"; // Import Poppins font
+import { styled, useTheme, useMediaQuery } from "@mui/material";
+import { IconButton, Typography, Button } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import LogoutIcon from "@mui/icons-material/Logout";
+import { padding } from "@mui/system";
 
-// Modal component for the login form with improved animations and cleanup
+// Styled components for better organization
+const UserWelcomeContainer = styled("div")(({ theme }) => ({
+  position: "absolute",
+  top: theme.spacing(2),
+  right: theme.spacing(2),
+  zIndex: 100,
+  display: "flex",
+  alignItems: "center",
+  gap: theme.spacing(1),
+  [theme.breakpoints.down("sm")]: {
+    top: theme.spacing(1),
+    right: theme.spacing(1),
+  },
+}));
+
+const WelcomeText = styled(Typography)(({ theme }) => ({
+  fontFamily: "Poppins, sans-serif",
+  fontWeight: 500,
+  color: theme.palette.common.white,
+  textShadow: "0 1px 3px rgba(0,0,0,0.5)",
+  [theme.breakpoints.down("sm")]: {
+    fontSize: "0.8rem",
+  },
+}));
+
+const LoginButton = styled(Button)(({ theme }) => ({
+  fontFamily: "Poppins, sans-serif",
+  fontWeight: 500,
+  color: theme.palette.common.white,
+  backgroundColor: "rgba(255,255,255,0.2)",
+  "&:hover": {
+    backgroundColor: "rgba(255,255,255,0.3)",
+  },
+  [theme.breakpoints.down("sm")]: {
+    padding: theme.spacing(0.5),
+    fontSize: "0.8rem",
+    minWidth: "auto",
+  },
+}));
+
+const CarContainer = styled("div")(({ theme }) => ({
+  height: "550px",
+  overflow: "hidden",
+  [theme.breakpoints.down("md")]: {
+    height: "450px",
+  },
+  [theme.breakpoints.down("sm")]: {
+    height: "350px",
+  },
+}));
+
+// Modal component with responsive improvements
 const LoginModal = ({ isOpen, onClose }) => {
   const [visible, setVisible] = useState(false);
   const modalContentRef = useRef(null);
   const modalOverlayRef = useRef(null);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Handle animation states when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
@@ -18,18 +76,15 @@ const LoginModal = ({ isOpen, onClose }) => {
     }
   }, [isOpen]);
 
-  // If modal is not open, don't render anything
   if (!isOpen) return null;
 
-  // Function to handle outside clicks with proper animation
   const handleOverlayClick = (e) => {
     if (e.target === modalOverlayRef.current) {
       setVisible(false);
-      setTimeout(onClose, 300); // Wait for fade out animation before removing from DOM
+      setTimeout(onClose, 300);
     }
   };
 
-  // Handle successful login closure
   const handleLoginSuccess = () => {
     setVisible(false);
     setTimeout(onClose, 300);
@@ -38,36 +93,38 @@ const LoginModal = ({ isOpen, onClose }) => {
   return (
     <div
       ref={modalOverlayRef}
-      className="login-modal-overlay"
       onClick={handleOverlayClick}
       style={{
-        position: 'fixed',
+        position: "fixed",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        backdropFilter: visible ? 'blur(5px)' : 'blur(0px)',
-        WebkitBackdropFilter: visible ? 'blur(5px)' : 'blur(0px)',
+        backgroundColor: "rgba(0, 0, 0, 0.6)",
+        backdropFilter: visible ? "blur(5px)" : "blur(0px)",
+        WebkitBackdropFilter: visible ? "blur(5px)" : "blur(0px)",
         zIndex: 1000,
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
         opacity: visible ? 1 : 0,
-        transition: 'opacity 0.3s ease, backdrop-filter 0.3s ease'
+        transition: "opacity 0.3s ease, backdrop-filter 0.3s ease",
+        padding: isMobile ? "1rem" : "2rem",
       }}
     >
-      {/* Modal content with animation */}
       <div
         ref={modalContentRef}
         onClick={(e) => e.stopPropagation()}
-        style={{ 
-          zIndex: 1001, 
-          width: '100%', 
-          maxWidth: '900px',
+        style={{
+          zIndex: 1001,
+          width: "100%",
+          maxWidth: isMobile ? "100%" : "900px",
+          maxHeight: isMobile ? "90vh" : "auto",
+          overflowY: "auto",
           opacity: visible ? 1 : 0,
-          transform: visible ? 'scale(1)' : 'scale(0.95)',
-          transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4)'
+          transform: visible ? "scale(1)" : "scale(0.95)",
+          transition: "all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.4)",
+          borderRadius: isMobile ? "0" : "8px",
         }}
       >
         <TourismLoginSignup onClose={handleLoginSuccess} />
@@ -80,19 +137,19 @@ function History() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  // Check for logged in user on component mount
   useEffect(() => {
-    const currentUser = localStorage.getItem('currentLoggedInUser');
+    const currentUser = localStorage.getItem("currentLoggedInUser");
     if (currentUser) {
       const user = JSON.parse(currentUser);
       setIsLoggedIn(true);
       setUserName(user.username);
     }
-    
-    // Listen for login/logout events
+
     const handleUserLogin = () => {
-      const loggedInUser = localStorage.getItem('currentLoggedInUser');
+      const loggedInUser = localStorage.getItem("currentLoggedInUser");
       if (loggedInUser) {
         const user = JSON.parse(loggedInUser);
         setIsLoggedIn(true);
@@ -100,99 +157,116 @@ function History() {
         closeLoginModal();
       }
     };
-    
+
     const handleUserLogout = () => {
       setIsLoggedIn(false);
       setUserName("");
     };
-    
-    window.addEventListener('userLoggedIn', handleUserLogin);
-    window.addEventListener('userLoggedOut', handleUserLogout);
-    
+
+    window.addEventListener("userLoggedIn", handleUserLogin);
+    window.addEventListener("userLoggedOut", handleUserLogout);
+
     return () => {
-      window.removeEventListener('userLoggedIn', handleUserLogin);
-      window.removeEventListener('userLoggedOut', handleUserLogout);
+      window.removeEventListener("userLoggedIn", handleUserLogin);
+      window.removeEventListener("userLoggedOut", handleUserLogout);
     };
   }, []);
 
-  // Function to handle sign in button click from Navbar
   const handleSignInClick = () => {
     setIsLoginModalOpen(true);
-    // Add a class to the body to prevent scrolling when modal is open
-    document.body.style.overflow = 'hidden';
+    document.body.style.overflow = "hidden";
   };
 
-  // Function to handle logout
   const handleLogout = () => {
-    localStorage.removeItem('currentLoggedInUser');
+    localStorage.removeItem("currentLoggedInUser");
     setIsLoggedIn(false);
     setUserName("");
-    // Dispatch event that user logged out
-    window.dispatchEvent(new CustomEvent('userLoggedOut'));
+    window.dispatchEvent(new CustomEvent("userLoggedOut"));
   };
 
-  // Function to close the login modal with enhanced cleanup
   const closeLoginModal = () => {
     setIsLoginModalOpen(false);
-    // Re-enable scrolling when modal is closed
-    document.body.style.overflow = 'auto';
-    
-    // Ensure any backdrop filters or blurs are completely removed
-    document.body.style.backdropFilter = 'none';
-    document.body.style.WebkitBackdropFilter = 'none';
-    
-    // Force repaint to ensure blur is gone - this is key to fixing the blur issue
-    document.body.style.transform = 'translateZ(0)';
-    
-    // Reset the transform after a short delay
+    document.body.style.overflow = "auto";
+    document.body.style.backdropFilter = "none";
+    document.body.style.WebkitBackdropFilter = "none";
+    document.body.style.transform = "translateZ(0)";
+
     setTimeout(() => {
-      document.body.style.transform = '';
+      document.body.style.transform = "";
     }, 50);
   };
-  
-  // Add the handleSignInClick function to the window object
-  // so the Navbar component can access it
+
   useEffect(() => {
     window.openLoginModal = handleSignInClick;
-    
-    // Cleanup the global function when component unmounts
+
     return () => {
       delete window.openLoginModal;
-      // Make sure to reset overflow in case component unmounts with modal open
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, []);
 
-  // Add ESC key event listener to close modal
   useEffect(() => {
     const handleEscKey = (event) => {
-      if (event.key === 'Escape' && isLoginModalOpen) {
+      if (event.key === "Escape" && isLoginModalOpen) {
         closeLoginModal();
       }
     };
-    
-    document.addEventListener('keydown', handleEscKey);
-    
-    // Cleanup
+
+    document.addEventListener("keydown", handleEscKey);
+
     return () => {
-      document.removeEventListener('keydown', handleEscKey);
+      document.removeEventListener("keydown", handleEscKey);
     };
   }, [isLoginModalOpen]);
 
   return (
-    <div>
-      {/* User welcome or login button */}
-     
+    <div style={{ fontFamily: "Poppins, sans-serif" }}>
+      {/* User welcome or login button - now properly positioned */}
+      <UserWelcomeContainer>
+        {isLoggedIn ? (
+          <>
+            <WelcomeText variant="body1">Welcome, {userName}</WelcomeText>
+            <IconButton
+              onClick={handleLogout}
+              size={isMobile ? "small" : "medium"}
+              sx={{
+                color: "white",
+                backgroundColor: "rgba(255,255,255,0.2)",
+                "&:hover": {
+                  backgroundColor: "rgba(255,255,255,0.3)",
+                },
+              }}
+            >
+              <LogoutIcon fontSize={isMobile ? "small" : "medium"} />
+            </IconButton>
+          </>
+        ) : (
+          <LoginButton
+            variant="contained"
+            startIcon={<AccountCircleIcon />}
+            onClick={handleSignInClick}
+            size={isMobile ? "small" : "medium"}
+          >
+            Sign In
+          </LoginButton>
+        )}
+      </UserWelcomeContainer>
 
-      <div style={{
-        height: '550px',
-        overflow: 'hidden',
-      }}>
+      <div
+        style={{
+          height: "550px",
+          overflow: "hidden",
+        }}
+      >
         <Car />
       </div>
-      <Content />
-      
-      {/* Login Modal */}
+      <Content
+        style={{
+          padding: "0 24px 24px", // top 0, left & right 24px, bottom 24px
+          overflow: "hidden",
+        }}
+      />
+
       <LoginModal isOpen={isLoginModalOpen} onClose={closeLoginModal} />
     </div>
   );
