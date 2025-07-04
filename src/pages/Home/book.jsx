@@ -278,7 +278,7 @@ const BookingForm = () => {
         fullWidth={isMobile}
         startIcon={<SearchIcon />}
       >
-        Search
+        Book Hotels
       </StyledButton>
     </BookingFormContainer>
   );
