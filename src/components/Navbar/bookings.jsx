@@ -24,10 +24,6 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import HotelIcon from '@mui/icons-material/Hotel';
 import FlightIcon from '@mui/icons-material/Flight';
 import TourIcon from '@mui/icons-material/Map';
-import '@fontsource/poppins/400.css';
-import '@fontsource/poppins/500.css';
-import '@fontsource/poppins/600.css';
-import '@fontsource/poppins/700.css';
 
 const poppinsTheme = createTheme({
   typography: {
@@ -67,18 +63,81 @@ const MyBookings = () => {
 
   const loadBookings = () => {
     try {
-      const storedDestinations = localStorage.getItem('bookedDestinations');
-      const destinations = storedDestinations ? JSON.parse(storedDestinations) : [];
+      // For demo purposes, creating sample bookings
+      const sampleDestinations = [
+        {
+          id: 1,
+          bookingId: 'DEST001',
+          label: 'Paris City Tour',
+          destination: 'Paris, France',
+          img: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=400&h=300&fit=crop',
+          bookingDate: '2024-12-15',
+          people: 2,
+          price: 1500
+        },
+        {
+          id: 2,
+          bookingId: 'DEST002',
+          label: 'Tokyo Adventure',
+          destination: 'Tokyo, Japan',
+          img: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop',
+          bookingDate: '2024-12-20',
+          people: 4,
+          price: 2800
+        },
+        {
+          id: 3,
+          bookingId: 'DEST003',
+          label: 'New York Explorer',
+          destination: 'New York, USA',
+          img: 'https://images.unsplash.com/photo-1496442226666-8d4d0e62e6e9?w=400&h=300&fit=crop',
+          bookingDate: '2024-12-25',
+          people: 3,
+          price: 2200
+        }
+      ];
       
-      const storedFormBookings = localStorage.getItem('bookingResponse');
-      const forms = storedFormBookings ? [JSON.parse(storedFormBookings)] : [];
+      const sampleFlights = [
+        {
+          bookingId: 'FL001',
+          fromAirport: 'LAX',
+          toAirport: 'JFK',
+          departureDate: '2024-12-18T10:30:00',
+          returnDate: '2024-12-25T15:45:00',
+          tripType: 'round-trip',
+          passengers: 2,
+          class: 'Business',
+          price: 1200
+        },
+        {
+          bookingId: 'FL002',
+          fromAirport: 'SFO',
+          toAirport: 'LHR',
+          departureDate: '2024-12-22T14:20:00',
+          tripType: 'one-way',
+          passengers: 1,
+          class: 'Economy',
+          price: 800
+        }
+      ];
       
-      const storedFlightBookings = localStorage.getItem('flightBookings');
-      const flights = storedFlightBookings ? JSON.parse(storedFlightBookings) : [];
+      const sampleHotels = [
+        {
+          bookingId: 'HTL001',
+          destination: 'Grand Palace Hotel',
+          location: 'Bangkok, Thailand',
+          checkIn: '2024-12-20',
+          checkOut: '2024-12-27',
+          adults: 2,
+          children: 1,
+          roomType: 'Deluxe Suite',
+          price: 980
+        }
+      ];
       
-      setDestinationBookings(destinations);
-      setFormBookings(forms);
-      setFlightBookings(flights);
+      setDestinationBookings(sampleDestinations);
+      setFormBookings(sampleHotels);
+      setFlightBookings(sampleFlights);
     } catch (error) {
       console.error("Error loading bookings:", error);
       setSnackbarMessage("Error loading bookings. Please try refreshing the page.");
@@ -89,16 +148,6 @@ const MyBookings = () => {
 
   useEffect(() => {
     loadBookings();
-    
-    const handleBookingsUpdate = () => {
-      loadBookings();
-    };
-    
-    window.addEventListener('bookingsUpdated', handleBookingsUpdate);
-    
-    return () => {
-      window.removeEventListener('bookingsUpdated', handleBookingsUpdate);
-    };
   }, []);
 
   const handleCancelBooking = (booking, type) => {
@@ -107,20 +156,16 @@ const MyBookings = () => {
         const updatedBookings = destinationBookings.filter(
           item => item.bookingId !== booking.bookingId && item.id !== booking.id
         );
-        localStorage.setItem('bookedDestinations', JSON.stringify(updatedBookings));
         setDestinationBookings(updatedBookings);
       } else if (type === 'form') {
-        localStorage.removeItem('bookingResponse');
         setFormBookings([]);
       } else if (type === 'flight') {
         const updatedBookings = flightBookings.filter(
           item => item.bookingId !== booking.bookingId
         );
-        localStorage.setItem('flightBookings', JSON.stringify(updatedBookings));
         setFlightBookings(updatedBookings);
       }
       
-      window.dispatchEvent(new CustomEvent('bookingsUpdated'));
       setSnackbarMessage(`Booking cancelled successfully!`);
       setSnackbarSeverity('success');
       setOpenSnackbar(true);
@@ -160,10 +205,7 @@ const MyBookings = () => {
     return new Date(dateB) - new Date(dateA);
   });
 
-  const isOddCount = allBookings.length % 2 !== 0;
-  const lastItemIsWide = isOddCount && allBookings.length > 2;
-
-  const getBookingItemStyle = (index) => {
+  const getBookingItemStyle = () => {
     if (isMobile) return { width: '100%' };
     
     if (allBookings.length === 1) {
@@ -174,21 +216,7 @@ const MyBookings = () => {
       };
     }
     
-    if (allBookings.length === 2) {
-      return { 
-        width: 'calc(50% - 12px)',
-        maxWidth: '400px'
-      };
-    }
-    
-    if (lastItemIsWide && index === allBookings.length - 1) {
-      return {
-        width: '100%',
-        maxWidth: '800px',
-        margin: '0 auto'
-      };
-    }
-    
+    // Consistent alignment for all items - no special handling for odd/even
     return {
       width: 'calc(50% - 12px)',
       maxWidth: '400px'
@@ -219,7 +247,7 @@ const MyBookings = () => {
       display: 'flex',
       flexWrap: 'wrap',
       gap: '24px',
-      justifyContent: allBookings.length <= 2 ? 'center' : 'flex-start',
+      justifyContent: allBookings.length === 1 ? 'center' : 'flex-start',
     },
     bookingCard: {
       backgroundColor: '#fff',
@@ -235,24 +263,6 @@ const MyBookings = () => {
         transform: 'translateY(-4px)',
         boxShadow: theme.shadows[4]
       },
-    },
-    wideCard: {
-      backgroundColor: '#fff',
-      borderRadius: 3,
-      boxShadow: theme.shadows[2],
-      overflow: 'hidden',
-      transition: 'transform 0.2s ease-in-out',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'row',
-      minHeight: isMobile ? 'auto' : '300px',
-      '&:hover': {
-        transform: 'translateY(-4px)',
-        boxShadow: theme.shadows[4]
-      },
-      [theme.breakpoints.down('sm')]: {
-        flexDirection: 'column'
-      }
     },
     flightHeader: {
       backgroundColor: theme.palette.primary.main,
@@ -276,15 +286,6 @@ const MyBookings = () => {
       objectFit: 'cover',
       mb: 2,
       borderRadius: 2
-    },
-    wideCardMedia: {
-      width: '40%',
-      height: 'auto',
-      objectFit: 'cover',
-      [theme.breakpoints.down('sm')]: {
-        width: '100%',
-        height: 160
-      }
     },
     detailRow: {
       display: 'flex',
@@ -324,16 +325,6 @@ const MyBookings = () => {
       display: 'flex',
       flexDirection: 'column',
     },
-    wideCardContent: {
-      p: 3,
-      flexGrow: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      width: '60%',
-      [theme.breakpoints.down('sm')]: {
-        width: '100%'
-      }
-    },
     detailsContainer: {
       flexGrow: 1,
       display: 'flex',
@@ -351,9 +342,9 @@ const MyBookings = () => {
     }
   };
 
-  const renderBookingCard = (booking, isWide = false) => {
+  const renderBookingCard = (booking) => {
     return (
-      <Card sx={isWide ? styles.wideCard : styles.bookingCard}>
+      <Card sx={styles.bookingCard}>
         {/* Card Header */}
         <Box sx={[
           booking.type === 'flight' && styles.flightHeader,
@@ -364,7 +355,6 @@ const MyBookings = () => {
             color: '#fff', 
             display: 'flex', 
             justifyContent: 'space-between',
-            ...(isWide && { width: '100%' })
           }
         ]}>
           <Typography variant="subtitle1" fontWeight={600}>
@@ -383,14 +373,14 @@ const MyBookings = () => {
         </Box>
 
         {/* Card Content */}
-        <CardContent sx={isWide ? styles.wideCardContent : styles.cardContent}>
+        <CardContent sx={styles.cardContent}>
           {/* Booking Image */}
           {booking.type === 'destination' && booking.img && (
             <CardMedia
               component="img"
               image={booking.img}
               alt={booking.label}
-              sx={isWide ? styles.wideCardMedia : styles.cardMedia}
+              sx={styles.cardMedia}
             />
           )}
 
@@ -543,7 +533,7 @@ const MyBookings = () => {
               {/* Class/Room Type */}
               {booking.type === 'flight' ? (
                 <Box sx={styles.detailRow}>
-                                   <Typography sx={styles.detailLabel}>
+                  <Typography sx={styles.detailLabel}>
                     Class:
                   </Typography>
                   <Typography sx={styles.detailValue}>
@@ -613,12 +603,9 @@ const MyBookings = () => {
             {allBookings.map((booking, index) => (
               <Box 
                 key={booking.bookingId || booking.id || index} 
-                sx={getBookingItemStyle(index)}
+                sx={getBookingItemStyle()}
               >
-                {renderBookingCard(
-                  booking, 
-                  lastItemIsWide && index === allBookings.length - 1
-                )}
+                {renderBookingCard(booking)}
               </Box>
             ))}
           </Box>
