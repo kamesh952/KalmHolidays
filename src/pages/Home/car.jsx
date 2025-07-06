@@ -38,11 +38,10 @@ const CarouselSlide = styled(Box)(({ active, direction }) => ({
   zIndex: active ? 1 : 0,
 }));
 
-const ImageContainer = styled('img')({
+const VideoContainer = styled('video')({
   width: '100%',
   height: '100%',
   objectFit: 'cover',
-  display: 'block',
 });
 
 const Overlay = styled(Box)({
@@ -60,7 +59,6 @@ const Overlay = styled(Box)({
   textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8)',
   padding: '0 20px',
   boxSizing: 'border-box',
-  background: 'rgba(0, 0, 0, 0.2)', // Slight overlay to improve text readability
 });
 
 const CarouselTitle = styled(Typography)(({ theme, fontFamily, active, delayedAnimation }) => ({
@@ -161,59 +159,61 @@ export const Car = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState('next');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [imageLoaded, setImageLoaded] = useState({});
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const slideIntervalRef = useRef(null);
+  const videoRefs = useRef([]);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const slides = [
     {
-      type: 'image',
-      src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      type: 'video',
+      src: "2.mp4",
       title: "Navigate the world",
       description: "Let the sounds of nature and breathtaking landscapes captivate you.",
       titleFont: "'Great Vibes', cursive",
       descFont: "'Dancing Script', cursive",
-      duration: 5000,
+      duration: 15000,
       delayedAnimation: true
     },
     {
-      type: 'image',
-      src: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
+      type: 'video',
+      src: "1.mp4",
       title: "Live the Life Joyfully",
       description: "Experience the breathtaking beauty of unspoiled nature and luxury.",
       titleFont: "'Satisfy', cursive",
       descFont: "'Sacramento', cursive",
-      duration: 5000,
+      duration: 15000,
       delayedAnimation: true
     },
     {
-      type: 'image',
-      src: "https://images.unsplash.com/photo-1519904981063-b0cf448d479e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      type: 'video',
+      src: "3.mp4",
       title: "Experiences the Adventures",
       description: "Experience the vibrant energy and dazzling lights of the city.",
       titleFont: "'Parisienne', cursive",
       descFont: "'Alex Brush', cursive",
-      duration: 5000,
+      duration: 15000,
     },
     {
-      type: 'image',
-      src: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+      type: 'video',
+      src: "4.mp4",
       title: "Explore the Unexplored",
       description: "Journey to places where adventure meets serenity.",
       titleFont: "'Playfair Display', serif",
       descFont: "'Petit Formal Script', cursive",
-      duration: 5000,
+      duration: 15000,
     },
     {
-      type: 'image',
-      src: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80",
+      type: 'video',
+      src: "5.mp4",
       title: "Loves the Nature",
       description: "Immerse yourself in sun-kissed beaches and crystal-clear waters.",
       titleFont: "'Pinyon Script', cursive",
       descFont: "'Playfair Display', serif",
-      duration: 5000,
+      duration: 15000,
       delayedAnimation: true
     },
   ];
@@ -223,28 +223,29 @@ export const Car = () => {
     fontLink.rel = 'stylesheet';
     fontLink.href = 'https://fonts.googleapis.com/css2?family=Great+Vibes&family=Dancing+Script&family=Playfair+Display&family=Sacramento&family=Parisienne&family=Alex+Brush&family=Satisfy&family=Pinyon+Script&family=Petit+Formal+Script&display=swap';
     document.head.appendChild(fontLink);
-    return () => {
-      if (document.head.contains(fontLink)) {
-        document.head.removeChild(fontLink);
-      }
-    };
+    return () => document.head.removeChild(fontLink);
   }, []);
 
-  // Preload images
   useEffect(() => {
-    slides.forEach((slide, index) => {
-      if (slide.type === 'image') {
-        const img = new Image();
-        img.onload = () => {
-          setImageLoaded(prev => ({ ...prev, [index]: true }));
-        };
-        img.onerror = () => {
-          console.error(`Failed to load image: ${slide.src}`);
-          setImageLoaded(prev => ({ ...prev, [index]: false }));
-        };
-        img.src = slide.src;
-      }
-    });
+    const handleInteraction = () => {
+      setUserInteracted(true);
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+      
+      // Try to play all videos after user interaction
+      videoRefs.current.forEach(video => {
+        if (video) {
+          video.play().catch(e => console.warn('Video play failed:', e));
+        }
+      });
+    };
+    
+    window.addEventListener('click', handleInteraction);
+    window.addEventListener('touchstart', handleInteraction);
+    return () => {
+      window.removeEventListener('click', handleInteraction);
+      window.removeEventListener('touchstart', handleInteraction);
+    };
   }, []);
 
   const showSlide = (index, direction) => {
@@ -278,6 +279,40 @@ export const Car = () => {
   }, [currentSlide]);
 
   useEffect(() => {
+    const handleVideoPlay = async (videoEl) => {
+      if (!videoEl) return;
+      
+      try {
+        await videoEl.play();
+        setIsVideoPlaying(true);
+      } catch (err) {
+        console.warn('Video play failed:', err);
+        setIsVideoPlaying(false);
+        
+        // If autoplay fails, add a play button overlay or other fallback
+      }
+    };
+
+    const slide = slides[currentSlide];
+    if (slide.type === 'video') {
+      const videoIndex = slides.slice(0, currentSlide).filter(s => s.type === 'video').length;
+      const videoEl = videoRefs.current[videoIndex];
+      
+      if (videoEl) {
+        videoEl.currentTime = 0;
+        
+        if (userInteracted) {
+          handleVideoPlay(videoEl);
+        } else {
+          // Even if user hasn't interacted, try to play muted (should work)
+          videoEl.muted = true;
+          handleVideoPlay(videoEl).catch(e => console.warn('Muted autoplay failed:', e));
+        }
+      }
+    }
+  }, [currentSlide, userInteracted]);
+
+  useEffect(() => {
     const duration = slides[currentSlide].duration;
     const startTime = Date.now();
     const interval = setInterval(() => {
@@ -290,8 +325,8 @@ export const Car = () => {
     };
   }, [currentSlide]);
 
-  const handleImageError = (e) => {
-    console.error('Image error:', e);
+  const handleVideoError = (e) => {
+    console.error('Video error:', e);
     // You could add fallback image or other error handling here
   };
 
@@ -299,16 +334,20 @@ export const Car = () => {
     <CarouselContainer onMouseEnter={stopAutoSlide} onMouseLeave={startAutoSlide}>
       {slides.map((slide, index) => (
         <CarouselSlide key={index} active={index === currentSlide} direction={slideDirection}>
-          {slide.type === 'image' ? (
-            <ImageContainer
-              src={slide.src}
-              alt={slide.title}
-              onError={handleImageError}
-              style={{
-                opacity: imageLoaded[index] === false ? 0.5 : 1,
-                filter: imageLoaded[index] === false ? 'blur(2px)' : 'none'
+          {slide.type === 'video' ? (
+            <VideoContainer
+              muted
+              loop
+              playsInline
+              ref={(el) => {
+                const videoIndex = slides.slice(0, index).filter(s => s.type === 'video').length;
+                videoRefs.current[videoIndex] = el;
               }}
-            />
+              onError={handleVideoError}
+            >
+              <source src={slide.src} type="video/mp4" />
+              Your browser does not support the video tag.
+            </VideoContainer>
           ) : null}
           <Overlay>
             <CarouselTitle

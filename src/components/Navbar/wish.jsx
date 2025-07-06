@@ -246,46 +246,43 @@ const Wishlist = ({ onClose }) => {
             </Button>
           </Paper>
         ) : (
-          <Grid 
-            container 
-            spacing={isMobile ? 2 : 3}
+          <Box
             sx={{
+              display: 'grid',
+              gridTemplateColumns: {
+                xs: '1fr',
+                sm: 'repeat(2, 1fr)',
+                md: 'repeat(2, 1fr)'
+              },
+              gap: isMobile ? 2 : 3,
               padding: isMobile ? '0 4px' : '0'
             }}
           >
             {wishlist.map((item) => (
-              <Grid 
-                item 
-                xs={12} 
-                sm={6} 
-                md={6} 
+              <Card
                 key={item.id}
                 sx={{
                   display: 'flex',
-                  justifyContent: 'center'
+                  flexDirection: 'column',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'transform 0.3s, box-shadow 0.3s',
+                  height: '100%', // Ensures all cards have same height
+                  '&:hover': {
+                    transform: isMobile ? 'none' : 'translateY(-4px)',
+                    boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : '0 6px 12px rgba(0,0,0,0.15)',
+                  }
                 }}
               >
-                <Card
-                  sx={{
-                    width: '100%',
-                    maxWidth: '400px',
-                    borderRadius: '12px',
-                    overflow: 'hidden',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    transition: 'transform 0.3s, box-shadow 0.3s',
-                    '&:hover': {
-                      transform: isMobile ? 'none' : 'translateY(-4px)',
-                      boxShadow: isMobile ? '0 2px 8px rgba(0,0,0,0.1)' : '0 6px 12px rgba(0,0,0,0.15)',
-                    }
-                  }}
-                >
                   {/* Image Section */}
                   <Box 
                     sx={{ 
                       position: 'relative',
                       width: '100%', 
-                      height: isMobile ? '180px' : isTablet ? '200px' : '240px',
-                      overflow: 'hidden'
+                      height: isMobile ? '200px' : '240px', // Fixed height for consistency
+                      overflow: 'hidden',
+                      flexShrink: 0 // Prevents image from shrinking
                     }}
                   >
                     <CardMedia
@@ -338,6 +335,9 @@ const Wishlist = ({ onClose }) => {
                   <CardContent 
                     sx={{ 
                       padding: isMobile ? '12px' : '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      flexGrow: 1, // Allows content to grow and fill space
                       '&:last-child': {
                         paddingBottom: isMobile ? '12px' : '16px'
                       }
@@ -351,7 +351,8 @@ const Wishlist = ({ onClose }) => {
                         fontSize: isMobile ? '1rem' : '1.125rem',
                         marginBottom: isMobile ? '8px' : '12px',
                         lineHeight: 1.3,
-                        color: '#333'
+                        color: '#333',
+                        minHeight: isMobile ? '1.3rem' : '1.575rem' // Ensures consistent title height
                       }}
                     >
                       {item.label}
@@ -362,12 +363,14 @@ const Wishlist = ({ onClose }) => {
                       sx={{ 
                         marginBottom: isMobile ? '12px' : '16px',
                         display: '-webkit-box',
-                        WebkitLineClamp: 2,
+                        WebkitLineClamp: 3, // Increased to 3 lines for better consistency
                         WebkitBoxOrient: 'vertical',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
                         fontSize: isMobile ? '0.8125rem' : '0.875rem',
-                        lineHeight: 1.5
+                        lineHeight: 1.5,
+                        flexGrow: 1, // Allows description to take up available space
+                        minHeight: isMobile ? '3.65rem' : '3.9375rem' // 3 lines * line-height * font-size
                       }}
                     >
                       {item.description || 'No description available'}
@@ -378,7 +381,8 @@ const Wishlist = ({ onClose }) => {
                       sx={{
                         display: 'flex',
                         justifyContent: 'space-between',
-                        gap: isMobile ? '8px' : '12px'
+                        gap: isMobile ? '8px' : '12px',
+                        marginTop: 'auto' // Pushes buttons to bottom
                       }}
                     >
                       <Button
@@ -430,9 +434,8 @@ const Wishlist = ({ onClose }) => {
                     </Box>
                   </CardContent>
                 </Card>
-              </Grid>
             ))}
-          </Grid>
+          </Box>
         )}
         
         {/* Notification Snackbar */}
